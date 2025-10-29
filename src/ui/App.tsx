@@ -26,6 +26,9 @@ export default function App() {
   const [editTime, setEditTime] = useState<string>('00:00');
   const [editAllDay, setEditAllDay] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [tokenInput, setTokenInput] = useState<string>(() => localStorage.getItem('gh_token') || '');
+  const [gistIdInput, setGistIdInput] = useState<string>(() => localStorage.getItem('gh_gist') || '');
+  const [fileNameInput, setFileNameInput] = useState<string>(() => localStorage.getItem('gh_file') || 'planner.json');
 
   useEffect(() => {
     localStorage.setItem('planner_view', view);
@@ -101,6 +104,12 @@ export default function App() {
       </header>
 
       {error && <div className="text-red-400 mb-3">{error}</div>}
+      {(!localStorage.getItem('gh_token') || !localStorage.getItem('gh_gist')) && (
+        <div className="mb-3 p-3 border border-yellow-700 bg-yellow-900/20 rounded text-sm">
+          Missing configuration: { !localStorage.getItem('gh_token') ? 'GitHub token' : '' }{ (!localStorage.getItem('gh_token') && !localStorage.getItem('gh_gist')) ? ' and ' : '' }{ !localStorage.getItem('gh_gist') ? 'Gist ID' : '' }.
+          <button className="ml-2 underline" onClick={() => setShowSettings(true)}>Open Settings</button>
+        </div>
+      )}
 
       <AddForm onAdd={addTask} />
 
@@ -269,6 +278,68 @@ export default function App() {
                   setDetailTask(null);
                   setEditDate('');
                 }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSettings && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-semibold mb-3">Settings</h2>
+            <div className="space-y-3">
+              <label className="block">
+                <div className="text-xs opacity-70 mb-1">GitHub Token (gist scope)</div>
+                <input
+                  type="password"
+                  className="w-full border border-zinc-800 bg-zinc-900 rounded px-2 py-2"
+                  placeholder="ghp_..."
+                  value={tokenInput}
+                  onChange={(e) => setTokenInput(e.target.value)}
+                />
+              </label>
+              <label className="block">
+                <div className="text-xs opacity-70 mb-1">Gist ID</div>
+                <input
+                  type="text"
+                  className="w-full border border-zinc-800 bg-zinc-900 rounded px-2 py-2"
+                  placeholder="e.g. a1b2c3d4e5f6..."
+                  value={gistIdInput}
+                  onChange={(e) => setGistIdInput(e.target.value.trim())}
+                />
+              </label>
+              <label className="block">
+                <div className="text-xs opacity-70 mb-1">File name in gist</div>
+                <input
+                  type="text"
+                  className="w-full border border-zinc-800 bg-zinc-900 rounded px-2 py-2"
+                  placeholder="planner.json"
+                  value={fileNameInput}
+                  onChange={(e) => setFileNameInput(e.target.value.trim() || 'planner.json')}
+                />
+              </label>
+              <div className="text-xs opacity-70">Stored locally in your browser only.</div>
+            </div>
+            <div className="flex justify-end gap-2 mt-5">
+              <button
+                className="px-3 py-2 rounded bg-zinc-700 hover:bg-zinc-600"
+                onClick={() => setShowSettings(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-3 py-2 rounded bg-emerald-600 hover:bg-emerald-500"
+                onClick={() => {
+                  localStorage.setItem('gh_token', tokenInput.trim());
+                  localStorage.setItem('gh_gist', gistIdInput.trim());
+                  localStorage.setItem('gh_file', (fileNameInput.trim() || 'planner.json'));
+                  // Reload so the planner picks up the new token (cfg is module-scoped)
+                  window.location.reload();
+                }}
+                disabled={!tokenInput.trim() || !gistIdInput.trim()}
               >
                 Save
               </button>
