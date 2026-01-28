@@ -89,6 +89,19 @@ export function expandOccurrences(
       continue;
     }
 
+    if (rep === 'bidaily') {
+      const baseDay = startOfDay(base);
+      for (const d of eachDayOfInterval({ start: rangeStart, end: rangeEnd })) {
+        const diffDays = Math.round((startOfDay(d).getTime() - baseDay.getTime()) / 86400000);
+        if (diffDays < 0 || diffDays % 2 !== 0) continue;
+        const when = setMinutes(setHours(d, base.getHours()), base.getMinutes());
+        if (untilTs && when.getTime() > untilTs) break;
+        const ymd = format(when, 'yyyy-MM-dd');
+        if (isAllowed(when) && !excluded.has(ymd)) out.push({ task: t, when });
+      }
+      continue;
+    }
+
     if (rep === 'weekly') {
       const weekday = getDay(base);
       for (const d of eachDayOfInterval({ start: rangeStart, end: rangeEnd })) {

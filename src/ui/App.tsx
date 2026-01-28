@@ -373,7 +373,12 @@ function AddForm({
         const date = String(fd.get('date') || '');
         const time = String(fd.get('time') || '');
         const duration = String(fd.get('duration') || '');
-        const repeat = String(fd.get('repeat') || 'none') as 'none' | 'daily' | 'weekly' | 'biweekly';
+        const repeat = String(fd.get('repeat') || 'none') as
+          | 'none'
+          | 'daily'
+          | 'bidaily'
+          | 'weekly'
+          | 'biweekly';
         if (!title) return;
 
         let startAt: number | undefined = undefined;
@@ -412,9 +417,10 @@ function AddForm({
       <input name="duration" placeholder="Duration (min or HH:MM)" className="border border-zinc-800 bg-zinc-900 rounded px-3 py-2" />
       <select name="repeat" className="border border-zinc-800 bg-zinc-900 rounded px-3 py-2">
         <option value="none">One-time</option>
-        <option value="daily">Day</option>
-        <option value="weekly">Weekly</option>
-        <option value="biweekly">Biweekly</option>
+      <option value="daily">Day</option>
+      <option value="bidaily">Bidaily</option>
+      <option value="weekly">Weekly</option>
+      <option value="biweekly">Biweekly</option>
       </select>
       <button className="rounded bg-zinc-800 px-3 py-2">Add</button>
     </form>

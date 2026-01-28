@@ -3,6 +3,7 @@ const GH_API = "https://api.github.com";
 export type Repeat =
   | { type: 'none' }
   | { type: 'daily' }
+  | { type: 'bidaily' }
   | { type: 'weekly' }
   | { type: 'biweekly' };
 
